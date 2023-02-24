@@ -1,9 +1,17 @@
 import express from "express";
-
+import db from "./config/db.js";
 import usuarioRoutes  from "./routes/usuarioRoutes.js"
 
 
 const app = express();
+
+try {
+  await db.authenticate();
+  console.log("conection db")
+  
+} catch (error) {
+  console.log(error)
+}
 app.set("view engine", "pug")
 app.set("views", "./views")
 
