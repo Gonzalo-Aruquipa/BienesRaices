@@ -1,12 +1,16 @@
 import express from "express";
 import db from "./config/db.js";
+import bodyParser from "body-parser";
 import usuarioRoutes  from "./routes/usuarioRoutes.js"
 
 
 const app = express();
 
+app.use(bodyParser.json())
+
 try {
   await db.authenticate();
+  db.sync()
   console.log("conection db")
   
 } catch (error) {
