@@ -7,11 +7,12 @@ import usuarioRoutes  from "./routes/usuarioRoutes.js"
 const app = express();
 
 app.use(bodyParser.json())
+app.use(express.urlencoded({extended: true}))
 
 try {
   await db.authenticate();
   db.sync()
-  console.log("conection db")
+  console.log("conection db successfully")
   
 } catch (error) {
   console.log(error)

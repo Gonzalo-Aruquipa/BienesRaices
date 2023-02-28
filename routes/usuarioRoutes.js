@@ -4,8 +4,8 @@ import { formularioLogin, formularioRegistro, registrar, recuperarPassword } fro
 const router = Router();
 
 router.get("/login", formularioLogin);
-router.get("/registro", formularioRegistro);
 router.post("/registro", registrar);
+router.get("/registro", formularioRegistro);
 router.get("/recuperar-password", recuperarPassword);
 
 export default router;
