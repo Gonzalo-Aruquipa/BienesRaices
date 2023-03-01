@@ -1,4 +1,6 @@
 import express from "express";
+import csrf from "csurf";
+import cookieParser from "cookie-parser";
 import db from "./config/db.js";
 import bodyParser from "body-parser";
 import usuarioRoutes  from "./routes/usuarioRoutes.js"
@@ -8,6 +10,8 @@ const app = express();
 
 app.use(bodyParser.json())
 app.use(express.urlencoded({extended: true}))
+app.use(cookieParser())
+app.use(csrf({cookie: true}))
 
 try {
   await db.authenticate();
