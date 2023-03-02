@@ -2,7 +2,7 @@ import { check, validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
 import Usuario from "../models/Usuario.js";
 import { generarId } from "../helpers/tokens.js";
-import {emailRegister} from "../helpers/emails.js"
+import { emailRegister, emailRecover } from "../helpers/emails.js";
 const formularioLogin = (req, res) => {
   res.render("auth/login", {
     pagina: "Iniciar Sesión",
@@ -12,7 +12,7 @@ const formularioLogin = (req, res) => {
 const formularioRegistro = (req, res) => {
   res.render("auth/registro", {
     pagina: "Crear Cuenta",
-    csrfToken: req.csrfToken()
+    csrfToken: req.csrfToken(),
   });
 };
 
@@ -79,22 +79,21 @@ const registrar = async (req, res) => {
     mensaje: "se envió un mensaje de verificación a su correo",
   });
 
-  
   emailRegister({
     nombre: usuario.nombre,
     email: usuario.email,
     token: usuario.token,
   });
 };
-const confirmar = async(req, res) => {
-  const {token} = req.params
+const confirmar = async (req, res) => {
+  const { token } = req.params;
 
-  const user = await Usuario.findOne({where : { token }});
+  const user = await Usuario.findOne({ where: { token } });
   if (!user) {
     return res.render("auth/confirmar", {
       pagina: "Error al confirmar tu cuenta",
       mensaje: "Intente de nuevo",
-      error: true
+      error: true,
     });
   }
   user.token = null;
@@ -104,12 +103,113 @@ const confirmar = async(req, res) => {
     pagina: "Cuenta Confirmada",
     mensaje: "La cuenta se confirmó correctamente",
   });
-  
-
-}
+};
 const recuperarPassword = (req, res) => {
   res.render("auth/recuperar-password", {
     pagina: "Recuperar Contraseña",
+    csrfToken: req.csrfToken(),
   });
 };
-export { formularioLogin, formularioRegistro, registrar, confirmar,  recuperarPassword };
+
+const resetPassword = async (req, res) => {
+  await check("email").isEmail().withMessage("example@example.com").run(req);
+  let result = validationResult(req);
+  //verification length
+  if (!result.isEmpty()) {
+    return res.render("auth/recuperar-password", {
+      pagina: "Recuperar Contraseña",
+      csrfToken: req.csrfToken(),
+      errores: result.array(),
+    });
+  }
+  const { email } = req.body;
+
+  const user = await Usuario.findOne({ where: { email } });
+  if (!user) {
+    return res.render("auth/recuperar-password", {
+      pagina: "Recuperar Contraseña",
+      csrfToken: req.csrfToken(),
+      errores: [{ msg: "El email introducido no está registrado" }],
+    });
+  }
+
+  user.token = generarId();
+  await user.save();
+
+  //send email
+
+  emailRecover({
+    nombre: user.nombre,
+    email: user.email,
+    token: user.token,
+  });
+
+  res.render("templates/mensaje", {
+    pagina: "Reestablece tu Contraseña",
+    mensaje: "Se envió un email con las instrucciones",
+  });
+};
+
+const comprobarToken = async (req, res) => {
+  const { token } = req.params;
+
+  const user = await Usuario.findOne({ where: { token } });
+  if (!user) {
+    return res.render("auth/confirmar", {
+      pagina: "Reestablece tu Contraseña",
+      mensaje: "Hubo un error en la validación, intenta de nuevo",
+      error: true,
+    });
+  }
+
+  res.render("auth/reset-password", {
+    pagina: "Reestablece tu Contraseña",
+    csrfToken: req.csrfToken(),
+  });
+};
+
+const nuevoPassword = async (req, res) => {
+  const { password } = req.body;
+  const { token } = req.params;
+
+  await check("password")
+    .isLength({ min: 6 })
+    .withMessage("Min 6 caracteres")
+    .run(req);
+
+  let result = validationResult(req);
+  //verification length
+  if (!result.isEmpty()) {
+    return res.render("auth/reset-password", {
+      pagina: "Reestablece tu Contraseña",
+      csrfToken: req.csrfToken(),
+      errores: result.array(),
+    });
+  }
+
+  const user = await Usuario.findOne({ where: { token } });
+
+  const salt = await bcrypt.genSaltSync(10);
+  const passCrypt = await bcrypt.hashSync(password, salt);
+  user.password = passCrypt;
+
+  user.token = null
+  await user.save()
+
+  res.render("auth/confirmar", {
+    pagina: "Contraseña Reestablecida",
+    mensaje: "La nueva contraseña se guardó correctamente"
+  })
+
+  
+};
+export {
+  formularioLogin,
+  formularioRegistro,
+  registrar,
+  confirmar,
+  recuperarPassword,
+  resetPassword,
+  comprobarToken,
+  nuevoPassword,
+};
