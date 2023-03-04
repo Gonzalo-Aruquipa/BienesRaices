@@ -3,11 +3,6 @@ import bcrypt from "bcryptjs";
 import Usuario from "../models/Usuario.js";
 import { generarId } from "../helpers/tokens.js";
 import { emailRegister, emailRecover } from "../helpers/emails.js";
-const formularioLogin = (req, res) => {
-  res.render("auth/login", {
-    pagina: "Iniciar Sesión",
-  });
-};
 
 const formularioRegistro = (req, res) => {
   res.render("auth/registro", {
@@ -193,18 +188,76 @@ const nuevoPassword = async (req, res) => {
   const passCrypt = await bcrypt.hashSync(password, salt);
   user.password = passCrypt;
 
-  user.token = null
-  await user.save()
+  user.token = null;
+  await user.save();
 
   res.render("auth/confirmar", {
     pagina: "Contraseña Reestablecida",
-    mensaje: "La nueva contraseña se guardó correctamente"
-  })
+    mensaje: "La nueva contraseña se guardó correctamente",
+  });
+};
 
-  
+const formularioLogin = (req, res) => {
+  res.render("auth/login", {
+    pagina: "Iniciar Sesión",
+    csrfToken: req.csrfToken(),
+  });
+};
+
+const autenticar = async (req, res) => {
+  const { email, password } = req.body;
+
+  await check("email").isEmail().withMessage("Email Inválido").run(req);
+  await check("password")
+    .notEmpty()
+    .withMessage("El password es obligatorio")
+    .run(req);
+
+  let result = validationResult(req);
+  if (!result.isEmpty()) {
+    return res.render("auth/login", {
+      pagina: "Iniciar Sesión",
+      csrfToken: req.csrfToken(),
+      errores: result.array(),
+      usuario: {
+        email: email,
+      },
+    });
+  }
+
+  const user = await Usuario.findOne({where:{ email }});
+
+  if (!user) {
+    // const validPassword = await bcrypt.compareSync(password, user.password);
+    return res.render("auth/login", {
+      pagina: "Iniciar Sesión",
+      csrfToken: req.csrfToken(),
+      errores: [{msg: "El usuario no existe"}]
+    });
+  }
+
+  if (!user.confirmado) {
+    return res.render("auth/login", {
+      pagina: "Iniciar Sesión",
+      csrfToken: req.csrfToken(),
+      errores: [{msg: "El usuario no está confirmado, revise su email"}]
+    });
+  }
+
+  const validPassword = await bcrypt.compareSync(password, user.password);
+  if(!validPassword){
+    return res.render("auth/login", {
+      pagina: "Iniciar Sesión",
+      csrfToken: req.csrfToken(),
+      errores: [{msg: "Contraseña Incorrecta"}],
+      usuario: {
+        email: email,
+      },
+    });
+
+  }
 };
 export {
-  formularioLogin,
   formularioRegistro,
   registrar,
   confirmar,
@@ -212,4 +265,6 @@ export {
   resetPassword,
   comprobarToken,
   nuevoPassword,
+  formularioLogin,
+  autenticar,
 };
