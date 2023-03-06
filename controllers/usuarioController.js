@@ -1,7 +1,8 @@
 import { check, validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import Usuario from "../models/Usuario.js";
-import { generarId } from "../helpers/tokens.js";
+import { generarId, generarToken } from "../helpers/tokens.js";
 import { emailRegister, emailRecover } from "../helpers/emails.js";
 
 const formularioRegistro = (req, res) => {
@@ -254,8 +255,14 @@ const autenticar = async (req, res) => {
         email: email,
       },
     });
-
   }
+
+  const token = generarToken(user.id)
+  return res.cookie("jwt", token, {
+    expires: new Date(Date.now() + 5000),
+    httpOnly: true,
+  }).redirect("mis-propiedades")
+  
 };
 export {
   formularioRegistro,
