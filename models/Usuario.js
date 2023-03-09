@@ -20,6 +20,9 @@ const Usuario = db.define("usuarios", {
   confirmado: {
     type: DataTypes.BOOLEAN,
   },
+  ss: {
+    type: DataTypes.STRING,
+  }
 });
 
 export default Usuario;
