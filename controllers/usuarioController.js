@@ -229,7 +229,6 @@ const autenticar = async (req, res) => {
   const user = await Usuario.findOne({where:{ email }});
 
   if (!user) {
-    // const validPassword = await bcrypt.compareSync(password, user.password);
     return res.render("auth/login", {
       pagina: "Iniciar Sesión",
       csrfToken: req.csrfToken(),
@@ -261,7 +260,7 @@ const autenticar = async (req, res) => {
   return res.cookie("jwt", token, {
     expires: new Date(Date.now() + 5000),
     httpOnly: true,
-  }).redirect("mis-propiedades")
+  }).redirect("/mis-propiedades")
   
 };
 export {
