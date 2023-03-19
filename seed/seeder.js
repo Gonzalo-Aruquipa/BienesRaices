@@ -1,7 +1,8 @@
 import categorias from "./categorias.js";
 import precios from "./precios.js";
+import usuarios from "./usuarios.js";
 import db from "../config/db.js";
-import { Categoria, Precio} from "../models/index.js"
+import { Categoria, Precio, Usuario} from "../models/index.js"
 
 const importarDatos = async () => {
   try {
@@ -9,6 +10,7 @@ const importarDatos = async () => {
     await db.sync();
     await Categoria.bulkCreate(categorias);
     await Precio.bulkCreate(precios)
+    await Usuario.bulkCreate(usuarios)
     process.exit();
   } catch (error) {
     console.log(error);
