@@ -90,7 +90,10 @@ const agregarImagen = async (req, res) => {
 
 
   res.render("propiedades/agregar-imagen", {
-    pagina: "Agregar Imagen",
+    pagina: `Agregar Imagen: ${prop.titulo}`,
+    csrfToken: req.csrfToken(),
+    propiedad: prop,
+
   });
 };
 

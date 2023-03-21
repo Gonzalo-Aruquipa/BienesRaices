@@ -1,6 +1,11 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { admin, crear, guardar, agregarImagen } from "../controllers/propiedadesController.js";
+import {
+  admin,
+  crear,
+  guardar,
+  agregarImagen,
+} from "../controllers/propiedadesController.js";
 import protegerRuta from "../middleware/protegerRuta.js";
 
 const router = Router();
@@ -29,5 +34,8 @@ router.post(
 
   guardar
 );
-router.get("/propiedades/agregar-imagen/:id", protegerRuta, agregarImagen)
+router.get("/propiedades/agregar-imagen/:id", protegerRuta, agregarImagen);
+router.post("/propiedades/agregar-imagen/:id", (req, res) => {
+  console.log("subiendo......");
+});
 export default router;
