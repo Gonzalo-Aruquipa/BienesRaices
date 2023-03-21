@@ -1,15 +1,15 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { admin, crear, guardar } from "../controllers/propiedadesController.js";
+import { admin, crear, guardar, agregarImagen } from "../controllers/propiedadesController.js";
 import protegerRuta from "../middleware/protegerRuta.js";
 
 const router = Router();
 
 router.get("/mis-propiedades", protegerRuta, admin);
-router.get("/propiedades/crear",  crear);
+router.get("/propiedades/crear", protegerRuta, crear);
 router.post(
   "/propiedades/crear",
-  
+  protegerRuta,
   body("titulo").notEmpty().withMessage("El título es obligatorio"),
   body("descripcion")
     .notEmpty()
@@ -29,5 +29,5 @@ router.post(
 
   guardar
 );
-
+router.get("/propiedades/agregar-imagen/:id", protegerRuta, agregarImagen)
 export default router;

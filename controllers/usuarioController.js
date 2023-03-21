@@ -258,7 +258,6 @@ const autenticar = async (req, res) => {
 
   const token = generarToken({id: user.id, nombre: user.nombre})
   return res.cookie("_jwt", token, {
-    expires: new Date(Date.now() + 5000),
     httpOnly: true,
   }).redirect("/mis-propiedades")
   

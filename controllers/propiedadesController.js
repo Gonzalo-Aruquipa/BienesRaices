@@ -3,7 +3,6 @@ import { Categoria, Precio, Propiedad } from "../models/index.js";
 const admin = (req, res) => {
   res.render("propiedades/admin", {
     pagina: "Mis Propiedades",
-    barra: true,
   });
 };
 
@@ -13,7 +12,6 @@ const crear = async (req, res) => {
 
   res.render("propiedades/crear", {
     pagina: "Crear Propiedad",
-    barra: true,
     csrfToken: req.csrfToken(),
     categorias: categorias,
     precios: precios,
@@ -31,7 +29,6 @@ const guardar = async (req, res) => {
       pagina: "Crear Propiedad",
       csrfToken: req.csrfToken(),
       errores: result.array(),
-      barra: true,
       categorias: categorias,
       precios: precios,
       datos: req.body,
@@ -51,14 +48,15 @@ const guardar = async (req, res) => {
     lng,
   } = req.body;
 
-  const { id } = req.usuario;
+  const { id: usuarioId } = req.usuario;
+
   try {
     const prop = await Propiedad.create({
       titulo,
       descripcion,
       categoriaId: categoria,
       precioId: precio,
-      usuarioId: "id",
+      usuarioId,
       habitaciones,
       estacionamiento,
       wc,
@@ -68,11 +66,32 @@ const guardar = async (req, res) => {
       imagen: "",
     });
     const { id } = prop;
-    res.redirect(`/propiedades/agregar-imagen/${id}`)
-
+    res.redirect(`/propiedades/agregar-imagen/${id}`);
   } catch (error) {
     console.log(error);
   }
 };
 
-export { admin, crear, guardar };
+const agregarImagen = async (req, res) => {
+  const { id } = req.params;
+
+  const prop = await Propiedad.findByPk(id);
+
+  if(!prop){
+    return res.redirect("/mis-propiedades")
+  }
+  if(prop.publicado){
+    return res.redirect("/mis-propiedades")
+  }
+
+  if(prop.usuarioId.toString() !== req.usuario.id.toString()){
+    return res.redirect("/mis-propiedades")
+  }
+
+
+  res.render("propiedades/agregar-imagen", {
+    pagina: "Agregar Imagen",
+  });
+};
+
+export { admin, crear, guardar, agregarImagen };

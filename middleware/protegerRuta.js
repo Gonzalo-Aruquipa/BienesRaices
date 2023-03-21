@@ -8,7 +8,7 @@ const protegerRuta = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(_jwt, "jwt");
+    const decoded = jwt.verify(_jwt, process.env.JWT_SECRET);
     const usuario = await Usuario.scope("eliminarAt").findByPk(decoded.id);
     if (usuario) {
       req.usuario = usuario;
