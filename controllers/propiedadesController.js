@@ -77,24 +77,49 @@ const agregarImagen = async (req, res) => {
 
   const prop = await Propiedad.findByPk(id);
 
-  if(!prop){
-    return res.redirect("/mis-propiedades")
+  if (!prop) {
+    return res.redirect("/mis-propiedades");
   }
-  if(prop.publicado){
-    return res.redirect("/mis-propiedades")
-  }
-
-  if(prop.usuarioId.toString() !== req.usuario.id.toString()){
-    return res.redirect("/mis-propiedades")
+  if (prop.publicado) {
+    return res.redirect("/mis-propiedades");
   }
 
+  if (prop.usuarioId.toString() !== req.usuario.id.toString()) {
+    return res.redirect("/mis-propiedades");
+  }
 
   res.render("propiedades/agregar-imagen", {
     pagina: `Agregar Imagen: ${prop.titulo}`,
     csrfToken: req.csrfToken(),
     propiedad: prop,
-
   });
 };
 
-export { admin, crear, guardar, agregarImagen };
+const almacenarImagen = async (req, res, next) => {
+  const { id } = req.params;
+
+  const prop = await Propiedad.findByPk(id);
+
+  if (!prop) {
+    return res.redirect("/mis-propiedades");
+  }
+  if (prop.publicado) {
+    return res.redirect("/mis-propiedades");
+  }
+
+  if (prop.usuarioId.toString() !== req.usuario.id.toString()) {
+    return res.redirect("/mis-propiedades");
+  }
+
+  try {
+    prop.imagen = req.file.filename;
+    prop.publicado = 1;
+
+    await prop.save();
+    next();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { admin, crear, guardar, agregarImagen, almacenarImagen };
