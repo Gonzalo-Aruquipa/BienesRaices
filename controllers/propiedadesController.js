@@ -218,9 +218,6 @@ const eliminar = async (req, res) => {
   if (!propiedad) {
     return res.redirect("/mis-propiedades");
   }
-  if (propiedad.publicado) {
-    return res.redirect("/mis-propiedades");
-  }
 
   if (propiedad.usuarioId.toString() !== req.usuario.id.toString()) {
     return res.redirect("/mis-propiedades");
