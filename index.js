@@ -5,6 +5,8 @@ import db from "./config/db.js";
 import bodyParser from "body-parser";
 import usuarioRoutes from "./routes/usuarioRoutes.js";
 import propiedadesRoutes from "./routes/propiedadesRoutes.js";
+import appRoutes from "./routes/appRoutes.js";
+import apiRoutes from "./routes/apiRoutes.js";
 
 const app = express();
 
@@ -25,8 +27,10 @@ app.set("views", "./views");
 
 app.use(express.static("public"));
 
+app.use("/", appRoutes);
 app.use("/auth", usuarioRoutes);
 app.use("/", propiedadesRoutes);
+app.use("/api", apiRoutes);
 
 const port = 3000;
 app.listen(port, () => {

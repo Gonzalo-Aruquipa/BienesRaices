@@ -1,7 +1,7 @@
 (function () {
   const lat = document.querySelector("#lat").value || -16.503831;
   const lng = document.querySelector("#lng").value || -68.1317191;
-  const mapa = L.map("mapa").setView([lat, lng], 15);
+  const mapa = L.map("mapa").setView([lat, lng], 13);
   let marker;
 
   const geocodeService = L.esri.Geocoding.geocodeService();
