@@ -24,6 +24,10 @@ block contenido
 
     div(id="mapa-inicio" class="h-[600px] mt-5 ")
 
+    section(class="py-5")
+      h2(class="text-center text-4xl font-extrabold pt-10")
+      pre=JSON.stringify(departamentos, undefined, 2) 
+
 block scripts  
   script(src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js")
   script(src="/js/mapaInicio.js")
