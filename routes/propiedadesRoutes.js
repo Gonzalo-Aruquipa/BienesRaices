@@ -13,6 +13,7 @@ import {
 } from "../controllers/propiedadesController.js";
 import protegerRuta from "../middleware/protegerRuta.js";
 import upload from "../middleware/subirImagen.js";
+import identificarUsuario from "../middleware/identificarUsuario.js";
 
 const router = Router();
 
@@ -72,5 +73,5 @@ router.post(
   guardarCambios
 );
 router.post("/propiedades/eliminar/:id", protegerRuta, eliminar)
-router.get("/propiedad/:id", mostrarPropiedad)
+router.get("/propiedad/:id", identificarUsuario, mostrarPropiedad)
 export default router;
