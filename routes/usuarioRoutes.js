@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { formularioLogin, formularioRegistro, registrar, confirmar, recuperarPassword, resetPassword, comprobarToken, nuevoPassword, autenticar} from "../controllers/usuarioController.js";
+import { formularioLogin, formularioRegistro, registrar, cerrarSesion, confirmar, recuperarPassword, resetPassword, comprobarToken, nuevoPassword, autenticar} from "../controllers/usuarioController.js";
 
 const router = Router();
 
 router.post("/registro", registrar);
 router.get("/confirma/:token", confirmar);
+router.post("/cerrar-sesion", cerrarSesion)
 router.get("/registro", formularioRegistro);
 router.get("/recuperar-password", recuperarPassword);
 router.post("/reset", resetPassword);

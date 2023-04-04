@@ -80,6 +80,10 @@ const registrar = async (req, res) => {
     token: usuario.token,
   });
 };
+
+const cerrarSesion = (req, res) => {
+  return res.clearCookie("_jwt").status(200).redirect("/auth/login")
+}
 const confirmar = async (req, res) => {
   const { token } = req.params;
 
@@ -264,6 +268,7 @@ const autenticar = async (req, res) => {
 export {
   formularioRegistro,
   registrar,
+  cerrarSesion,
   confirmar,
   recuperarPassword,
   resetPassword,
